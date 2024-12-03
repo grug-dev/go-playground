@@ -21,6 +21,7 @@ func main() {
 	pgconcurrency.Run()
 	pgconcurrency.RescheduleRunner()
 	pgconcurrency.BuildRaceCondition()
+	pgconcurrency.BuildRaceConditionFixed()
 
 }
 

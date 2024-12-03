@@ -756,8 +756,45 @@ When two or more goroutines have unsynchronized access to a shared resource and 
 
 ![See Example](../pg_concurrency/racecondition.go)
 
+
+[] - Check the Go detector for race conditions something like `go build -race detector flag`
+
 ![](img/goconcurrency.png)
 
+## Locking shared Resources
+
+Go provides traditional support to synchronize goroutines by locking access to shared resources. If you need to serialize access to an integer variable or a block of code, then the functions in the atomic and sync packages may be a good solution. We'll look at a few of the atomic package functions and the mutex type from the sync package.
+
+* **Goroutine Synchronization** is supported through built-in locking mechanisms
+* **atomic package** provides functions for atomic operations on shared variables
+* **sync package** offers mutex type for serializing access to code blocks
+* **Shared Resource Access** can be controlled through these synchronization primitives
+  
+
+### Actomic Fuctions
+
+Atomic functions provide low-level locking mechanisms for synchronizing access to integers and pointers.
+
+* **Atomic Functions** serve as low-level synchronization mechanisms
+* **Atomic Operations** work specifically with integers and pointers
+
+Example:
+
+Instead of using a local variable for the counter, use the `atomic.AddInt64(&counter, 1)` from the `sync` package.
+
+This function synchronizes the adding of integer values by enforcing that only one goroutine can perform and complete this add operation at a time. When goroutines attempt to call any atomic function, they're automatically synchronized against the variable that's referenced. Now we get the correct value of 4.
+
+* **Atomic Functions** provide automatic synchronization between goroutines
+* **Synchronized Operations** ensure only one goroutine completes an operation at a time
+* **Atomic Add Operation** guarantees correct results by preventing race conditions
+
+![See](../pg_concurrency/raceconditionFixed.go)
+
+Two other useful atomic functions are LoadInt64 and StoreInt64. These functions provide a safe way to read and write to an integer value.
+
+* **LoadInt64** provides safe atomic reading of integer values
+* **StoreInt64** enables safe atomic writing of integer values
+* **Safe Operations** guarantee thread-safe access to shared integer variables
 
 
 
