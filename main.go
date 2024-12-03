@@ -19,6 +19,9 @@ func main() {
 	fmt.Println("Using Quote: " + quote.Go())
 	testingDataStructures()
 	pgconcurrency.Run()
+	pgconcurrency.RescheduleRunner()
+	pgconcurrency.BuildRaceCondition()
+
 }
 
 func printNumbers() {

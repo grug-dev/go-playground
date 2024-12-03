@@ -681,7 +681,82 @@ Based on the scheduler's internal algorithms, a running goroutine can be stopped
 
 “You can see this behavior by creating a goroutine that requires a longer amount of time to complete its work.”
 
+```go
+package pgconcurrency
 
+import (
+	"fmt"
+	"runtime"
+	"sync"
+)
+
+// wg is used to wait for the program to finish.
+var wg sync.WaitGroup
+
+// main is the entry point for all Go programs.
+func RescheduleRunner() {
+	fmt.Println("Rescheduling Runner ...")
+	// Allocate 1 logical processors for the scheduler to use.
+	runtime.GOMAXPROCS(1)
+
+	// Add a count of two, one for each goroutine.
+	wg.Add(2)
+
+	// Create two goroutines.
+	fmt.Println("Create Goroutines")
+
+	go printPrime("A")
+	go printPrime("B")
+
+	// Wait for the goroutines to finish.
+	fmt.Println("Waiting To Finish")
+	wg.Wait()
+
+	fmt.Println("Terminating Reschedulig Program")
+}
+
+// printPrime displays prime numbers for the first 5000 numbers.
+func printPrime(prefix string) {
+	// Schedule the call to Done to tell main we are done.
+	defer wg.Done()
+
+	// Labeled Loop
+next:
+	for outer := 2; outer < 5000; outer++ {
+		for inner := 2; inner < outer; inner++ {
+			if outer%inner == 0 {
+				continue next
+			}
+		}
+		fmt.Printf("%s:%d\n", prefix, outer)
+	}
+	fmt.Println("Completed", prefix)
+}
+
+```
+
+## “How to change the number of logical processors”
+
+```go
+“import "runtime"
+
+// Allocate a logical processor for every available core.
+runtime.GOMAXPROCS(runtime.NumCPU())”
+```
+
+If we set more than 1 logical processor, N goroutines start running almost immediately, and their outputs are interleaved. When running on an eight-core machine, each goroutine can run on its own core. Goroutines can only run in parallel if there are multiple logical processors available and physical processors to run each goroutine simultaneously.
+
+## RACE Conditions
+
+When two or more goroutines have unsynchronized access to a shared resource and attempt to read and write to that resource at the same time, you have what's called a race condition. Race conditions are the reason concurrent programming is complicated and has a greater potential for bugs. Read and write operations against a shared resource must always be atomic, or in other words, done by only one goroutine at a time.
+
+* **Race Conditions** occur when multiple goroutines access shared resources without synchronization
+* **Atomic Operations** are essential - only one goroutine should read/write shared resources at a time
+* **Concurrent Programming** complexity stems from managing race conditions and shared resource access
+
+![See Example](../pg_concurrency/racecondition.go)
+
+![](img/goconcurrency.png)
 
 
 
